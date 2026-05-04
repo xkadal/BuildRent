@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}">
+<head>
+    <title>Каталог</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container py-5">
+        <h2 class="mb-4">Каталог обладнання</h2>
+
+        <!-- Search -->
+        <form th:action="@{/catalog}" method="get" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Пошук обладнання..."
+                       th:value="${searchQuery}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Знайти
+                </button>
+            </div>
+        </form>
+
+        <!-- Equipment Grid -->
+        <div class="row g-4">
+            <div class="col-md-4" th:each="item : ${equipment}">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="badge bg-secondary mb-2" th:text="${item.category.name}">Категорія</span>
+                        <h5 class="card-title" th:text="${item.name}">Назва</h5>
+                        <p class="card-text text-muted small" th:text="${item.description}">Опис</p>
+                        <p class="mb-1">
+                            <i class="bi bi-boxes"></i> В наявності: <span th:text="${item.quantity}">0</span> шт.
+                        </p>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-primary fs-5" th:text="${item.pricePerDay} + ' грн/добу'">Ціна</span>
+                        <a th:href="@{/catalog/{id}(id=${item.id})}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-cart-plus"></i> Орендувати
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(equipment)}" class="text-center py-5">
+            <i class="bi bi-inbox fs-1 text-muted"></i>
+            <p class="text-muted mt-3">Обладнання не знайдено</p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

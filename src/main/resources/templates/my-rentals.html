@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}">
+<head>
+    <title>Мої замовлення</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container py-5">
+        <h2 class="mb-4">Мої замовлення</h2>
+
+        <div th:if="${#lists.isEmpty(rentals)}" class="text-center py-5">
+            <i class="bi bi-inbox fs-1 text-muted"></i>
+            <p class="text-muted mt-3">У вас ще немає замовлень</p>
+            <a th:href="@{/catalog}" class="btn btn-primary">Перейти до каталогу</a>
+        </div>
+
+        <div class="table-responsive" th:if="${!#lists.isEmpty(rentals)}">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Обладнання</th>
+                        <th>Дата початку</th>
+                        <th>Дата закінчення</th>
+                        <th>Сума</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="rental : ${rentals}">
+                        <td th:text="${rental.id}">1</td>
+                        <td th:text="${rental.equipment.name}">Обладнання</td>
+                        <td th:text="${#temporals.format(rental.startDate, 'dd.MM.yyyy')}">01.01.2025</td>
+                        <td th:text="${#temporals.format(rental.endDate, 'dd.MM.yyyy')}">05.01.2025</td>
+                        <td th:text="${rental.totalPrice} + ' грн'">1000 грн</td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${rental.status.name() == 'PENDING'} ? 'bg-warning' :
+                                                  (${rental.status.name() == 'ACTIVE'} ? 'bg-success' :
+                                                  (${rental.status.name() == 'COMPLETED'} ? 'bg-info' : 'bg-danger'))"
+                                  th:text="${rental.status.name() == 'PENDING'} ? 'Очікує' :
+                                           (${rental.status.name() == 'ACTIVE'} ? 'Активне' :
+                                           (${rental.status.name() == 'COMPLETED'} ? 'Завершено' : 'Скасовано'))">
+                                Статус
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

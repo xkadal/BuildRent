@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}">
+<head>
+    <title>Адмін-панель</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container py-5">
+        <h2 class="mb-4"><i class="bi bi-gear"></i> Адмін-панель</h2>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3 th:text="${#lists.size(equipment)}">0</h3>
+                        <p class="mb-0">Одиниць обладнання</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3 th:text="${#lists.size(rentals)}">0</h3>
+                        <p class="mb-0">Замовлень</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3 th:text="${#lists.size(categories)}">0</h3>
+                        <p class="mb-0">Категорій</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mb-4">
+            <a th:href="@{/admin/equipment/add}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Додати обладнання
+            </a>
+        </div>
+
+        <!-- Rentals Table -->
+        <h4 class="mt-4">Замовлення</h4>
+        <div class="table-responsive">
+            <table class="table table-hover table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Клієнт</th>
+                        <th>Обладнання</th>
+                        <th>Період</th>
+                        <th>Сума</th>
+                        <th>Статус</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="rental : ${rentals}">
+                        <td th:text="${rental.id}">1</td>
+                        <td th:text="${rental.client.fullName}">Клієнт</td>
+                        <td th:text="${rental.equipment.name}">Обладнання</td>
+                        <td>
+                            <span th:text="${#temporals.format(rental.startDate, 'dd.MM')}">01.01</span> —
+                            <span th:text="${#temporals.format(rental.endDate, 'dd.MM.yyyy')}">05.01.2025</span>
+                        </td>
+                        <td th:text="${rental.totalPrice} + ' грн'">1000</td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${rental.status.name() == 'PENDING'} ? 'bg-warning' :
+                                                  (${rental.status.name() == 'ACTIVE'} ? 'bg-success' :
+                                                  (${rental.status.name() == 'COMPLETED'} ? 'bg-info' : 'bg-danger'))"
+                                  th:text="${rental.status}">
+                                Статус
+                            </span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/rentals/{id}/status(id=${rental.id})}" method="post" class="d-inline">
+                                <select name="status" class="form-select form-select-sm d-inline-block" style="width: auto;"
+                                        onchange="this.form.submit()">
+                                    <option value="" disabled selected>Змінити</option>
+                                    <option value="PENDING">Очікує</option>
+                                    <option value="ACTIVE">Активне</option>
+                                    <option value="COMPLETED">Завершено</option>
+                                    <option value="CANCELLED">Скасовано</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>
