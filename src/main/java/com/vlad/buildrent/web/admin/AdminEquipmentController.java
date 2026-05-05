@@ -4,14 +4,11 @@ import com.vlad.buildrent.domain.Category;
 import com.vlad.buildrent.domain.Equipment;
 import com.vlad.buildrent.domain.EquipmentImage;
 import com.vlad.buildrent.repository.CategoryRepository;
-import com.vlad.buildrent.repository.EquipmentRepository;
 import com.vlad.buildrent.service.EquipmentService;
 import com.vlad.buildrent.service.FileStorageService;
 import com.vlad.buildrent.util.SlugUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -26,15 +23,13 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class AdminEquipmentController {
 
-    private final EquipmentRepository equipmentRepository;
     private final CategoryRepository categoryRepository;
     private final EquipmentService equipmentService;
     private final FileStorageService fileStorageService;
 
     @GetMapping
     public String list(@RequestParam(required = false, defaultValue = "0") int page, Model model) {
-        Page<Equipment> result = equipmentRepository.findAll(
-                PageRequest.of(Math.max(0, page), 20, Sort.by(Sort.Direction.DESC, "createdAt")));
+        Page<Equipment> result = equipmentService.adminPage(page, 20);
         model.addAttribute("page", result);
         return "admin/equipment-list";
     }
@@ -87,7 +82,7 @@ public class AdminEquipmentController {
             eq.setModel(model);
             eq.setCategory(category);
             eq.setActive(active);
-            Equipment saved = equipmentRepository.save(eq);
+            Equipment saved = equipmentService.save(eq);
 
             if (image != null && !image.isEmpty()) {
                 String url = fileStorageService.store(image);
@@ -98,7 +93,7 @@ public class AdminEquipmentController {
                         .main(saved.getImages().isEmpty())
                         .build();
                 saved.getImages().add(img);
-                equipmentRepository.save(saved);
+                equipmentService.save(saved);
             }
 
             ra.addFlashAttribute("success", "Збережено");
@@ -123,7 +118,7 @@ public class AdminEquipmentController {
         if (eq.getImages().stream().noneMatch(EquipmentImage::isMain) && !eq.getImages().isEmpty()) {
             eq.getImages().get(0).setMain(true);
         }
-        equipmentRepository.save(eq);
+        equipmentService.save(eq);
         ra.addFlashAttribute("success", "Фото видалено");
         return "redirect:/admin/equipment/" + id + "/edit";
     }

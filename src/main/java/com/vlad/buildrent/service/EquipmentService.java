@@ -26,24 +26,34 @@ public class EquipmentService {
     private final EquipmentRepository equipmentRepository;
     private final CategoryRepository categoryRepository;
 
+    @Transactional(readOnly = true)
     public List<Equipment> findFeatured(int limit) {
-        return equipmentRepository.findFeatured(PageRequest.of(0, limit));
+        List<Equipment> items = equipmentRepository.findFeatured(PageRequest.of(0, limit));
+        items.forEach(this::initializeCardRelations);
+        return items;
     }
 
+    @Transactional(readOnly = true)
     public Equipment findBySlug(String slug) {
-        return equipmentRepository.findBySlug(slug)
+        Equipment equipment = equipmentRepository.findBySlug(slug)
                 .orElseThrow(() -> new IllegalArgumentException("Обладнання не знайдено: " + slug));
+        initializeDetailsRelations(equipment);
+        return equipment;
     }
 
+    @Transactional(readOnly = true)
     public Equipment getById(Long id) {
-        return equipmentRepository.findById(id)
+        Equipment equipment = equipmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Обладнання не знайдено: " + id));
+        initializeDetailsRelations(equipment);
+        return equipment;
     }
 
     public List<String> findDistinctBrands() {
         return equipmentRepository.findDistinctBrands();
     }
 
+    @Transactional(readOnly = true)
     public Page<Equipment> search(EquipmentFilter filter, int page, int size, String sortKey) {
         Sort sort = switch (sortKey == null ? "" : sortKey) {
             case "price-asc"  -> Sort.by("pricePerDay").ascending();
@@ -52,7 +62,17 @@ public class EquipmentService {
             default           -> Sort.by("createdAt").descending();
         };
         Pageable pageable = PageRequest.of(Math.max(0, page), size, sort);
-        return equipmentRepository.findAll(buildSpec(filter), pageable);
+        Page<Equipment> result = equipmentRepository.findAll(buildSpec(filter), pageable);
+        result.getContent().forEach(this::initializeCardRelations);
+        return result;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Equipment> adminPage(int page, int size) {
+        Page<Equipment> result = equipmentRepository.findAll(
+                PageRequest.of(Math.max(0, page), size, Sort.by(Sort.Direction.DESC, "createdAt")));
+        result.getContent().forEach(this::initializeCardRelations);
+        return result;
     }
 
     private Specification<Equipment> buildSpec(EquipmentFilter f) {
@@ -107,6 +127,16 @@ public class EquipmentService {
 
     public List<Category> allCategories() {
         return categoryRepository.findAllByOrderBySortOrderAscNameAsc();
+    }
+
+    private void initializeCardRelations(Equipment equipment) {
+        equipment.getCategory().getName();
+        equipment.getImages().size();
+    }
+
+    private void initializeDetailsRelations(Equipment equipment) {
+        initializeCardRelations(equipment);
+        equipment.getSpecs().size();
     }
 
     public record EquipmentFilter(

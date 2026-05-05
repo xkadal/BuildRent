@@ -21,12 +21,18 @@ public class ReviewService {
     private final EquipmentRepository equipmentRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<Review> findRecent(int limit) {
-        return reviewRepository.findRecentApproved(PageRequest.of(0, limit));
+        List<Review> reviews = reviewRepository.findRecentApproved(PageRequest.of(0, limit));
+        reviews.forEach(this::initializeViewRelations);
+        return reviews;
     }
 
+    @Transactional(readOnly = true)
     public List<Review> approvedFor(Long equipmentId) {
-        return reviewRepository.findByEquipmentIdAndApprovedTrueOrderByCreatedAtDesc(equipmentId);
+        List<Review> reviews = reviewRepository.findByEquipmentIdAndApprovedTrueOrderByCreatedAtDesc(equipmentId);
+        reviews.forEach(this::initializeViewRelations);
+        return reviews;
     }
 
     public RatingSummary summary(Long equipmentId) {
@@ -74,5 +80,10 @@ public class ReviewService {
 
     public record RatingSummary(double average, long count) {
         public String formatted() { return String.format("%.1f", average); }
+    }
+
+    private void initializeViewRelations(Review review) {
+        review.getClient().getEmail();
+        review.getEquipment().getName();
     }
 }
