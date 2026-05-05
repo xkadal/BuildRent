@@ -135,6 +135,12 @@ public class RentalService {
                 .orElseThrow(() -> new IllegalArgumentException("Замовлення не знайдено: " + orderNumber));
     }
 
+    @Transactional(readOnly = true)
+    public Rental getByOrderNumberWithItems(String orderNumber) {
+        return rentalRepository.findByOrderNumberWithItems(orderNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Замовлення не знайдено: " + orderNumber));
+    }
+
     private String generateOrderNumber() {
         String date = ORDER_DATE_FMT.format(Instant.now());
         int suffix = ThreadLocalRandom.current().nextInt(100, 1000);

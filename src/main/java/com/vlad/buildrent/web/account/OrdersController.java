@@ -43,7 +43,7 @@ public class OrdersController {
     public String details(@AuthenticationPrincipal AppUserPrincipal principal,
                           @PathVariable String orderNumber,
                           Model model) {
-        Rental rental = rentalService.getByOrderNumber(orderNumber);
+        Rental rental = rentalService.getByOrderNumberWithItems(orderNumber);
         ensureOwner(principal, rental);
         model.addAttribute("rental", rental);
         return "account/order-details";

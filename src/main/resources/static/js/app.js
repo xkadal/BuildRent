@@ -1,6 +1,15 @@
 (function () {
     'use strict';
 
+    const IMG_FALLBACK = '/img/placeholder.svg';
+    document.addEventListener('error', function (ev) {
+        const t = ev.target;
+        if (t && t.tagName === 'IMG' && t.src !== window.location.origin + IMG_FALLBACK && !t.dataset.brFallbackApplied) {
+            t.dataset.brFallbackApplied = '1';
+            t.src = IMG_FALLBACK;
+        }
+    }, true);
+
     function getCsrf() {
         const tokenMeta = document.querySelector('meta[name="_csrf"]');
         const headerMeta = document.querySelector('meta[name="_csrf_header"]');

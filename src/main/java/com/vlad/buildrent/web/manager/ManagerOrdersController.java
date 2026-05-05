@@ -39,7 +39,7 @@ public class ManagerOrdersController {
 
     @GetMapping("/{orderNumber}")
     public String details(@PathVariable String orderNumber, Model model) {
-        Rental rental = rentalService.getByOrderNumber(orderNumber);
+        Rental rental = rentalService.getByOrderNumberWithItems(orderNumber);
         model.addAttribute("rental", rental);
         return "manager/order-details";
     }

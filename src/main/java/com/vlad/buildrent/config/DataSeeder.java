@@ -139,7 +139,7 @@ public class DataSeeder implements CommandLineRunner {
                 "650.00", "5000.00", 2,
                 List.of(spec("Потужність", "2.2 кВт"), spec("Об'єм бака", "3.6 л"),
                         spec("Шум", "57 дБ")),
-                List.of("https://images.unsplash.com/photo-1620662831913-3ddef93f4f24?w=800"));
+                List.of("https://images.unsplash.com/photo-1581094488379-6b8e4e4d3f0a?w=800"));
 
         equip(heavy, "Віброплита Wacker Neuson WP1550", "Wacker Neuson", "WP1550",
                 "Віброплита для ущільнення ґрунту та асфальту.",

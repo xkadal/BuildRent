@@ -19,6 +19,16 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
 
     Optional<Rental> findByOrderNumber(String orderNumber);
 
+    @Query("""
+        select distinct r from Rental r
+        left join fetch r.items i
+        left join fetch i.equipment e
+        left join fetch e.category
+        left join fetch r.client
+        where r.orderNumber = :orderNumber
+    """)
+    Optional<Rental> findByOrderNumberWithItems(@Param("orderNumber") String orderNumber);
+
     Page<Rental> findByClientOrderByCreatedAtDesc(User client, Pageable pageable);
 
     Page<Rental> findAllByOrderByCreatedAtDesc(Pageable pageable);
