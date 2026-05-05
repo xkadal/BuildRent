@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="bar(page, baseUrl, queryString)" th:if="${page.totalPages > 1}" aria-label="Пагінація">
+    <ul class="pagination justify-content-center">
+        <li class="page-item" th:classappend="${page.first} ? 'disabled' : ''">
+            <a class="page-link"
+               th:href="@{__${baseUrl}__(page=${page.number - 1}, __${queryString}__)}">‹</a>
+        </li>
+        <li class="page-item"
+            th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+            th:classappend="${i == page.number} ? 'active' : ''">
+            <a class="page-link"
+               th:href="@{__${baseUrl}__(page=${i}, __${queryString}__)}"
+               th:text="${i + 1}">1</a>
+        </li>
+        <li class="page-item" th:classappend="${page.last} ? 'disabled' : ''">
+            <a class="page-link"
+               th:href="@{__${baseUrl}__(page=${page.number + 1}, __${queryString}__)}">›</a>
+        </li>
+    </ul>
+</nav>
+</body>
+</html>

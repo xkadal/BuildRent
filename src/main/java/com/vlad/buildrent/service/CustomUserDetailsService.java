@@ -1,15 +1,12 @@
 package com.vlad.buildrent.service;
 
-import com.vlad.buildrent.model.User;
 import com.vlad.buildrent.repository.UserRepository;
+import com.vlad.buildrent.security.AppUserPrincipal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +16,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Користувача з email " + email + " не знайдено"));
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                List.of(new SimpleGrantedAuthority(user.getRole().name()))
-        );
+        return userRepository.findByEmailIgnoreCase(email)
+                .map(AppUserPrincipal::new)
+                .orElseThrow(() -> new UsernameNotFoundException("Користувача не знайдено: " + email));
     }
 }

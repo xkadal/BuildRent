@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head><title th:text="'Замовлення ' + ${rental.orderNumber}">Замовлення</title></head>
+<body>
+<main layout:fragment="content">
+<div class="container py-4">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a th:href="@{/account/orders}">Мої замовлення</a></li>
+            <li class="breadcrumb-item active" th:text="${rental.orderNumber}"></li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h1 class="mb-0">
+            Замовлення <span th:text="${rental.orderNumber}">№</span>
+        </h1>
+        <div>
+            <span th:replace="~{fragments/status-badge :: badge(${rental.status})}"></span>
+            <span th:replace="~{fragments/status-badge :: paymentBadge(${rental.paymentStatus})}"></span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Позиції</h5>
+                    <table class="table">
+                        <thead class="table-light">
+                        <tr><th>Обладнання</th><th class="text-center">Період</th>
+                            <th class="text-center">К-сть</th><th class="text-end">Сума</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="i : ${rental.items}">
+                            <td>
+                                <a th:href="@{'/catalog/' + ${i.equipment.slug}}" class="text-decoration-none text-dark"
+                                   th:text="${i.equipment.name}">Назва</a>
+                                <div class="small text-muted">
+                                    <span th:text="${#numbers.formatDecimal(i.pricePerDay,0,'NONE',0,'NONE')} + ' ₴ / доба'"></span>
+                                    × <span th:text="${i.daysCount}">1</span> дн.
+                                </div>
+                            </td>
+                            <td class="text-center small"
+                                th:text="${#temporals.format(rental.startDate,'dd.MM.yyyy')} + ' – ' + ${#temporals.format(rental.endDate,'dd.MM.yyyy')}"></td>
+                            <td class="text-center" th:text="${i.quantity}">1</td>
+                            <td class="text-end fw-semibold"
+                                th:text="${#numbers.formatDecimal(i.lineTotal,0,'NONE',0,'NONE')} + ' ₴'"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4" th:if="${rental.status.name() == 'RETURNED'}">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-chat-square-heart"></i> Залишити відгук</h5>
+                    <div th:each="item : ${rental.items}" class="border-bottom py-3">
+                        <strong th:text="${item.equipment.name}">Назва</strong>
+                        <form th:action="@{'/account/orders/' + ${rental.orderNumber} + '/review'}" method="post" class="mt-2">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <input type="hidden" name="equipmentId" th:value="${item.equipment.id}">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="form-label small mb-1">Оцінка</label>
+                                    <select name="rating" class="form-select form-select-sm">
+                                        <option value="5">★★★★★ — Чудово</option>
+                                        <option value="4">★★★★ — Добре</option>
+                                        <option value="3">★★★ — Прийнятно</option>
+                                        <option value="2">★★ — Слабко</option>
+                                        <option value="1">★ — Погано</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-7">
+                                    <label class="form-label small mb-1">Коментар</label>
+                                    <input type="text" name="text" class="form-control form-control-sm" maxlength="500">
+                                </div>
+                                <div class="col-md-2 d-grid">
+                                    <button type="submit" class="btn btn-sm btn-primary">Надіслати</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <aside class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Підсумок</h5>
+                    <table class="table table-sm table-borderless mb-2">
+                        <tr><td class="text-muted">Підсумок</td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(rental.subtotal,0,'NONE',0,'NONE')} + ' ₴'"></td></tr>
+                        <tr><td class="text-muted">Доставка</td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(rental.deliveryFee,0,'NONE',0,'NONE')} + ' ₴'"></td></tr>
+                        <tr class="border-top"><td class="fs-5">Усього</td>
+                            <td class="text-end fs-5 fw-bold text-primary"
+                                th:text="${#numbers.formatDecimal(rental.total,0,'NONE',0,'NONE')} + ' ₴'"></td></tr>
+                    </table>
+
+                    <div th:if="${rental.paymentStatus.name() == 'UNPAID' and (rental.status.name() == 'PENDING' or rental.status.name() == 'CONFIRMED')}"
+                         class="d-grid">
+                        <a th:href="@{'/checkout/payment/' + ${rental.orderNumber}}" class="btn btn-primary">
+                            <i class="bi bi-credit-card"></i> Оплатити
+                        </a>
+                    </div>
+
+                    <form th:if="${rental.status.name() == 'PENDING' or rental.status.name() == 'CONFIRMED' or rental.status.name() == 'PAID'}"
+                          th:action="@{'/account/orders/' + ${rental.orderNumber} + '/cancel'}"
+                          method="post" class="mt-2 d-grid">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('Скасувати замовлення?')">
+                            <i class="bi bi-x-lg"></i> Скасувати замовлення
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body small">
+                    <p class="mb-1"><strong>Період:</strong>
+                        <span th:text="${#temporals.format(rental.startDate,'dd.MM.yyyy')}"></span> –
+                        <span th:text="${#temporals.format(rental.endDate,'dd.MM.yyyy')}"></span>
+                    </p>
+                    <p class="mb-1"><strong>Спосіб отримання:</strong>
+                        <span th:text="${rental.deliveryType.name() == 'DELIVERY' ? 'Доставка' : 'Самовивіз'}"></span>
+                    </p>
+                    <p class="mb-1" th:if="${rental.deliveryAddress != null}">
+                        <strong>Адреса:</strong> <span th:text="${rental.deliveryAddress}"></span>
+                    </p>
+                    <p class="mb-0" th:if="${rental.clientNotes != null and !rental.clientNotes.isEmpty()}">
+                        <strong>Коментар:</strong> <span th:text="${rental.clientNotes}"></span>
+                    </p>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+</main>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title th:text="${subject}">BuildRent</title></head>
+<body style="font-family:Arial,sans-serif;background:#f4f5f7;margin:0;padding:24px;">
+<table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0"
+       style="background:#fff;border-radius:8px;overflow:hidden;">
+    <tr><td style="background:#1f2733;color:#fff;padding:18px 24px;">
+        <h2 style="margin:0;">BuildRent</h2></td></tr>
+    <tr><td style="padding:24px;">
+        <p>Дякуємо, <strong th:text="${client.fullName()}">Клієнт</strong>!</p>
+        <p>Обладнання за замовленням <strong th:text="${rental.orderNumber}">№</strong> повернуто.
+            Сподіваємось, ви залишилися задоволені оренди.</p>
+        <p>Будемо вдячні, якщо знайдете хвилину залишити відгук — це допоможе іншим орендарям
+            обрати потрібну техніку.</p>
+    </td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head><title>Каталог</title></head>
+<body>
+<main layout:fragment="content">
+<div class="container py-4">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a th:href="@{/}">Головна</a></li>
+            <li class="breadcrumb-item active">Каталог</li>
+            <li class="breadcrumb-item active" th:if="${categoryHeading != null}" th:text="${categoryHeading.name}"></li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-1" th:text="${categoryHeading != null ? categoryHeading.name : 'Каталог обладнання'}">Каталог</h1>
+    <p class="text-muted" th:text="${categoryHeading != null ? categoryHeading.description : 'Знайдіть обладнання для будь-якого завдання'}"></p>
+
+    <div class="row g-4 mt-2">
+
+        <aside class="col-lg-3">
+            <form method="get" th:action="@{/catalog}" class="filter-sidebar">
+                <h6>Пошук</h6>
+                <div class="input-group input-group-sm mb-2">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="search" name="q" class="form-control" placeholder="Назва, бренд…"
+                           th:value="${filter.query()}">
+                </div>
+
+                <h6>Категорія</h6>
+                <div class="form-check mb-1">
+                    <input class="form-check-input" type="radio" name="category" value=""
+                           th:checked="${activeCategory == null or activeCategory.isEmpty()}" id="cat-all">
+                    <label class="form-check-label" for="cat-all">Усі категорії</label>
+                </div>
+                <div class="form-check mb-1" th:each="cat : ${categories}">
+                    <input class="form-check-input" type="radio" name="category"
+                           th:value="${cat.slug}"
+                           th:checked="${activeCategory == cat.slug}"
+                           th:id="${'cat-' + cat.slug}">
+                    <label class="form-check-label" th:for="${'cat-' + cat.slug}" th:text="${cat.name}"></label>
+                </div>
+
+                <h6 class="mt-3">Ціна за добу, ₴</h6>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="від"
+                               th:value="${filter.minPrice()}" min="0">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="до"
+                               th:value="${filter.maxPrice()}" min="0">
+                    </div>
+                </div>
+
+                <h6 class="mt-3">Бренд</h6>
+                <select name="brand" class="form-select form-select-sm">
+                    <option value="">Будь-який</option>
+                    <option th:each="b : ${brands}" th:value="${b}" th:text="${b}"
+                            th:selected="${filter.brand() == b}"></option>
+                </select>
+
+                <input type="hidden" name="sort" th:value="${sort}">
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Застосувати</button>
+                    <a th:href="@{/catalog}" class="btn btn-outline-secondary btn-sm">Скинути</a>
+                </div>
+            </form>
+        </aside>
+
+        <section class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <span class="text-muted small">
+                    Знайдено: <strong th:text="${page.totalElements}">0</strong>
+                </span>
+                <form method="get" th:action="@{/catalog}" class="d-flex align-items-center gap-2">
+                    <input type="hidden" name="q" th:value="${filter.query()}">
+                    <input type="hidden" name="category" th:value="${filter.categorySlug()}">
+                    <input type="hidden" name="minPrice" th:value="${filter.minPrice()}">
+                    <input type="hidden" name="maxPrice" th:value="${filter.maxPrice()}">
+                    <input type="hidden" name="brand" th:value="${filter.brand()}">
+                    <label class="text-muted small mb-0">Сортувати:</label>
+                    <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()" style="width:auto;">
+                        <option value="newest"     th:selected="${sort == 'newest'}">за новизною</option>
+                        <option value="price-asc"  th:selected="${sort == 'price-asc'}">ціна ↑</option>
+                        <option value="price-desc" th:selected="${sort == 'price-desc'}">ціна ↓</option>
+                        <option value="name"       th:selected="${sort == 'name'}">назва А-Я</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-xl-4" th:each="item : ${page.content}">
+                    <div th:replace="~{fragments/equipment-card :: card(${item})}"></div>
+                </div>
+                <div class="col-12 empty-state" th:if="${page.totalElements == 0}">
+                    <i class="bi bi-search"></i>
+                    <h5 class="mt-2">Нічого не знайдено</h5>
+                    <p class="mb-0">Спробуйте змінити фільтри або пошуковий запит</p>
+                </div>
+            </div>
+
+            <nav class="mt-4" th:if="${page.totalPages > 1}">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/catalog(page=${page.number - 1}, q=${filter.query()}, category=${filter.categorySlug()}, minPrice=${filter.minPrice()}, maxPrice=${filter.maxPrice()}, brand=${filter.brand()}, sort=${sort})}">‹</a>
+                    </li>
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                        th:classappend="${i == page.number} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/catalog(page=${i}, q=${filter.query()}, category=${filter.categorySlug()}, minPrice=${filter.minPrice()}, maxPrice=${filter.maxPrice()}, brand=${filter.brand()}, sort=${sort})}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/catalog(page=${page.number + 1}, q=${filter.query()}, category=${filter.categorySlug()}, minPrice=${filter.minPrice()}, maxPrice=${filter.maxPrice()}, brand=${filter.brand()}, sort=${sort})}">›</a>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+</div>
+</main>
+</body>
+</html>

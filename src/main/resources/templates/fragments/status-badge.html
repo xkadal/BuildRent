@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<body>
+<span th:fragment="badge(status)"
+      class="badge status-badge"
+      th:classappend="${'status-' + status.name()}"
+      th:switch="${status.name()}">
+    <span th:case="'PENDING'">Очікує підтвердження</span>
+    <span th:case="'CONFIRMED'">Підтверджено</span>
+    <span th:case="'PAID'">Оплачено</span>
+    <span th:case="'ACTIVE'">В оренді</span>
+    <span th:case="'RETURNED'">Повернуто</span>
+    <span th:case="'CANCELLED'">Скасовано</span>
+</span>
+
+<span th:fragment="paymentBadge(status)"
+      class="badge"
+      th:classappend="${status.name() == 'PAID' ? 'bg-success' : (status.name() == 'REFUNDED' ? 'bg-secondary' : 'bg-warning text-dark')}"
+      th:switch="${status.name()}">
+    <span th:case="'UNPAID'">Не оплачено</span>
+    <span th:case="'PAID'">Оплачено</span>
+    <span th:case="'REFUNDED'">Повернено</span>
+</span>
+
+<span th:fragment="rating(value)" class="rating-stars">
+    <i class="bi" th:each="i : ${#numbers.sequence(1, 5)}"
+       th:classappend="${i <= value ? 'bi-star-fill' : 'bi-star'}"
+       th:attrappend="class=${i <= value ? '' : ' empty'}"></i>
+</span>
+</body>
+</html>

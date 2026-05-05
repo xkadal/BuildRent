@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title th:text="${subject}">BuildRent</title></head>
+<body style="font-family:Arial,sans-serif;background:#f4f5f7;margin:0;padding:24px;">
+<table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0"
+       style="background:#fff;border-radius:8px;overflow:hidden;">
+    <tr>
+        <td style="background:#1f2733;color:#fff;padding:18px 24px;">
+            <h2 style="margin:0;">BuildRent</h2>
+            <p style="margin:4px 0 0;color:#ea7a1f;">Прокат будівельного обладнання</p>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:24px;">
+            <p>Вітаємо, <strong th:text="${client.fullName()}">Клієнт</strong>!</p>
+            <p>Ми отримали ваше замовлення <strong th:text="${rental.orderNumber}">№</strong> від
+                <span th:text="${#temporals.format(rental.createdAt, 'dd.MM.yyyy HH:mm')}"></span>.
+                Зараз воно у статусі <em>«Очікує підтвердження»</em>. Менеджер зв'яжеться з вами
+                найближчим часом.</p>
+
+            <h4>Позиції</h4>
+            <table cellpadding="6" cellspacing="0" width="100%" style="border-collapse:collapse;">
+                <tr style="background:#f4f5f7;text-align:left;">
+                    <th>Обладнання</th><th>К-сть</th><th>Днів</th><th style="text-align:right;">Сума</th>
+                </tr>
+                <tr th:each="i : ${items}" style="border-bottom:1px solid #e9ecef;">
+                    <td th:text="${i.equipment.name}">—</td>
+                    <td th:text="${i.quantity}">1</td>
+                    <td th:text="${i.daysCount}">1</td>
+                    <td style="text-align:right;" th:text="${#numbers.formatDecimal(i.lineTotal,0,'NONE',0,'NONE')} + ' ₴'"></td>
+                </tr>
+            </table>
+
+            <p style="margin-top:18px;">
+                Період: <strong>
+                    <span th:text="${#temporals.format(rental.startDate,'dd.MM.yyyy')}"></span> –
+                    <span th:text="${#temporals.format(rental.endDate,'dd.MM.yyyy')}"></span>
+                </strong><br>
+                Спосіб отримання: <strong th:text="${rental.deliveryType.name() == 'DELIVERY' ? 'Доставка' : 'Самовивіз'}"></strong><br>
+                Підсумок: <strong th:text="${#numbers.formatDecimal(rental.subtotal,0,'NONE',0,'NONE')} + ' ₴'"></strong><br>
+                Доставка: <strong th:text="${#numbers.formatDecimal(rental.deliveryFee,0,'NONE',0,'NONE')} + ' ₴'"></strong><br>
+                <span style="font-size:1.1em;">До сплати: <strong style="color:#ea7a1f;"
+                    th:text="${#numbers.formatDecimal(rental.total,0,'NONE',0,'NONE')} + ' ₴'"></strong></span>
+            </p>
+
+            <p style="margin-top:24px;color:#6c757d;font-size:.9em;">
+                Це автоматичне повідомлення, відповідати на нього не потрібно.
+            </p>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head><title>Мої замовлення</title></head>
+<body>
+<main layout:fragment="content">
+<div class="container py-4">
+    <h1 class="mb-4"><i class="bi bi-bag"></i> Мої замовлення</h1>
+
+    <div class="empty-state" th:if="${page.totalElements == 0}">
+        <i class="bi bi-bag-x"></i>
+        <h5 class="mt-2">У вас ще немає замовлень</h5>
+        <p class="mb-3 text-muted">Перейдіть до каталогу та оформіть першу оренду.</p>
+        <a th:href="@{/catalog}" class="btn btn-primary"><i class="bi bi-search"></i> До каталогу</a>
+    </div>
+
+    <div class="card border-0 shadow-sm" th:if="${page.totalElements > 0}">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Номер</th>
+                    <th>Дата</th>
+                    <th>Період</th>
+                    <th>Сума</th>
+                    <th>Статус</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${page.content}">
+                    <td><strong th:text="${r.orderNumber}">№</strong></td>
+                    <td class="small text-muted" th:text="${#temporals.format(r.createdAt,'dd.MM.yyyy HH:mm')}"></td>
+                    <td class="small">
+                        <span th:text="${#temporals.format(r.startDate,'dd.MM.yyyy')}"></span> –
+                        <span th:text="${#temporals.format(r.endDate,'dd.MM.yyyy')}"></span>
+                    </td>
+                    <td><strong th:text="${#numbers.formatDecimal(r.total,0,'NONE',0,'NONE')} + ' ₴'"></strong></td>
+                    <td><span th:replace="~{fragments/status-badge :: badge(${r.status})}"></span></td>
+                    <td class="text-end">
+                        <a th:href="@{'/account/orders/' + ${r.orderNumber}}" class="btn btn-sm btn-outline-primary">
+                            Деталі <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav class="mt-4" th:if="${page.totalPages > 1}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+                th:classappend="${i == page.number} ? 'active'">
+                <a class="page-link" th:href="@{/account/orders(page=${i})}" th:text="${i + 1}">1</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</main>
+</body>
+</html>

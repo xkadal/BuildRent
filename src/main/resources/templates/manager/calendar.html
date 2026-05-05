@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head><title>Календар</title></head>
+<body>
+<main layout:fragment="content">
+<div class="container-fluid py-4">
+    <h1 class="mb-3"><i class="bi bi-calendar3"></i> Календар оренд</h1>
+    <p class="text-muted">Активні замовлення на наступні 3 тижні</p>
+
+    <div class="empty-state" th:if="${#lists.isEmpty(rentals)}">
+        <i class="bi bi-calendar-x"></i>
+        <p class="mb-0 mt-2">Активних замовлень немає</p>
+    </div>
+
+    <div class="card border-0 shadow-sm" th:if="${not #lists.isEmpty(rentals)}">
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm mb-0 small">
+                <thead class="table-light">
+                <tr>
+                    <th style="min-width: 180px;">Замовлення</th>
+                    <th th:each="d : ${days}" class="text-center"
+                        th:classappend="${d == today ? 'table-warning' : ''}">
+                        <span th:text="${#temporals.format(d,'dd')}">01</span><br>
+                        <small class="text-muted" th:text="${#temporals.format(d,'EEE')}">Пн</small>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${rentals}">
+                    <td>
+                        <a th:href="@{'/manager/orders/' + ${r.orderNumber}}"
+                           class="fw-semibold text-decoration-none" th:text="${r.orderNumber}"></a>
+                        <div class="text-muted" th:text="${r.client.fullName()}"></div>
+                        <span th:replace="~{fragments/status-badge :: badge(${r.status})}"></span>
+                    </td>
+                    <td th:each="d : ${days}" class="text-center"
+                        th:classappend="${(d.equals(r.startDate) or d.equals(r.endDate) or (d.isAfter(r.startDate) and d.isBefore(r.endDate))) ? 'bg-primary-subtle' : ''}">
+                        <i class="bi bi-square-fill text-primary"
+                           th:if="${(d.equals(r.startDate) or d.equals(r.endDate) or (d.isAfter(r.startDate) and d.isBefore(r.endDate)))}"></i>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</main>
+</body>
+</html>

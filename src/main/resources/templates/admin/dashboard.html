@@ -1,100 +1,118 @@
 <!DOCTYPE html>
 <html lang="uk" xmlns:th="http://www.thymeleaf.org"
-      layout:decorate="~{layout}">
-<head>
-    <title>Адмін-панель</title>
-</head>
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head><title>Адмін — Дашборд</title></head>
 <body>
 <main layout:fragment="content">
-    <div class="container py-5">
-        <h2 class="mb-4"><i class="bi bi-gear"></i> Адмін-панель</h2>
+<div class="container py-4">
+    <h1 class="mb-4"><i class="bi bi-speedometer2"></i> Адмін-панель</h1>
 
-        <!-- Stats -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-4">
-                <div class="card bg-primary text-white">
-                    <div class="card-body text-center">
-                        <h3 th:text="${#lists.size(equipment)}">0</h3>
-                        <p class="mb-0">Одиниць обладнання</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-success text-white">
-                    <div class="card-body text-center">
-                        <h3 th:text="${#lists.size(rentals)}">0</h3>
-                        <p class="mb-0">Замовлень</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-info text-white">
-                    <div class="card-body text-center">
-                        <h3 th:text="${#lists.size(categories)}">0</h3>
-                        <p class="mb-0">Категорій</p>
-                    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Дохід (30 дн.)</div>
+                    <div class="display-6 fw-bold text-primary"
+                         th:text="${#numbers.formatDecimal(summary.monthlyRevenue,0,'NONE',0,'NONE')} + ' ₴'">0</div>
                 </div>
             </div>
         </div>
-
-        <!-- Actions -->
-        <div class="mb-4">
-            <a th:href="@{/admin/equipment/add}" class="btn btn-success">
-                <i class="bi bi-plus-circle"></i> Додати обладнання
-            </a>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Активні оренди</div>
+                    <div class="display-6 fw-bold" th:text="${summary.activeRentals}">0</div>
+                </div>
+            </div>
         </div>
-
-        <!-- Rentals Table -->
-        <h4 class="mt-4">Замовлення</h4>
-        <div class="table-responsive">
-            <table class="table table-hover table-sm">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Клієнт</th>
-                        <th>Обладнання</th>
-                        <th>Період</th>
-                        <th>Сума</th>
-                        <th>Статус</th>
-                        <th>Дії</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="rental : ${rentals}">
-                        <td th:text="${rental.id}">1</td>
-                        <td th:text="${rental.client.fullName}">Клієнт</td>
-                        <td th:text="${rental.equipment.name}">Обладнання</td>
-                        <td>
-                            <span th:text="${#temporals.format(rental.startDate, 'dd.MM')}">01.01</span> —
-                            <span th:text="${#temporals.format(rental.endDate, 'dd.MM.yyyy')}">05.01.2025</span>
-                        </td>
-                        <td th:text="${rental.totalPrice} + ' грн'">1000</td>
-                        <td>
-                            <span class="badge"
-                                  th:classappend="${rental.status.name() == 'PENDING'} ? 'bg-warning' :
-                                                  (${rental.status.name() == 'ACTIVE'} ? 'bg-success' :
-                                                  (${rental.status.name() == 'COMPLETED'} ? 'bg-info' : 'bg-danger'))"
-                                  th:text="${rental.status}">
-                                Статус
-                            </span>
-                        </td>
-                        <td>
-                            <form th:action="@{/admin/rentals/{id}/status(id=${rental.id})}" method="post" class="d-inline">
-                                <select name="status" class="form-select form-select-sm d-inline-block" style="width: auto;"
-                                        onchange="this.form.submit()">
-                                    <option value="" disabled selected>Змінити</option>
-                                    <option value="PENDING">Очікує</option>
-                                    <option value="ACTIVE">Активне</option>
-                                    <option value="COMPLETED">Завершено</option>
-                                    <option value="CANCELLED">Скасовано</option>
-                                </select>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Очікують підтвердження</div>
+                    <div class="display-6 fw-bold text-warning" th:text="${summary.pendingRentals}">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Оплачено</div>
+                    <div class="display-6 fw-bold text-success" th:text="${summary.paidRentals}">0</div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Розподіл за статусами</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex justify-content-between py-2 border-bottom"
+                            th:each="entry : ${summary.statusBreakdown}">
+                            <span th:text="${entry.key}">PENDING</span>
+                            <strong th:text="${entry.value}">0</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Топ-5 обладнання за виручкою</h5>
+                    <ol class="ps-3 mb-0">
+                        <li class="py-1" th:each="t : ${summary.topEquipment}">
+                            <span th:text="${t.name}">Назва</span>
+                            <strong class="float-end"
+                                    th:text="${#numbers.formatDecimal(t.revenue,0,'NONE',0,'NONE')} + ' ₴'"></strong>
+                        </li>
+                        <li class="text-muted small" th:if="${#lists.isEmpty(summary.topEquipment)}">Поки що даних немає</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Замовлення за днями (30 днів)</h5>
+                    <div class="empty-state" th:if="${#maps.size(summary.ordersByDay) == 0}">
+                        <i class="bi bi-bar-chart"></i>
+                        <p class="mb-0 mt-2">Поки що немає замовлень</p>
+                    </div>
+                    <table class="table table-sm" th:if="${#maps.size(summary.ordersByDay) > 0}">
+                        <thead><tr><th>Дата</th><th>К-сть</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="entry : ${summary.ordersByDay}">
+                            <td th:text="${#temporals.format(entry.key,'dd.MM.yyyy')}"></td>
+                            <td th:text="${entry.value}"></td>
+                            <td>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" th:style="'width: ' + ${entry.value * 10} + '%;'"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Підсумок</h5>
+                    <p class="mb-1">Усього обладнання: <strong th:text="${summary.totalEquipment}">0</strong></p>
+                    <p class="mb-0">Усього користувачів: <strong th:text="${summary.totalUsers}">0</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </main>
 </body>
 </html>

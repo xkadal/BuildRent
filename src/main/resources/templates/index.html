@@ -1,41 +1,132 @@
 <!DOCTYPE html>
 <html lang="uk" xmlns:th="http://www.thymeleaf.org"
-      layout:decorate="~{layout}">
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <title>Головна</title>
 </head>
 <body>
 <main layout:fragment="content">
 
-    <!-- Hero Section -->
-    <section class="bg-primary text-white py-5">
+    <section class="br-hero">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <h1 class="display-4 fw-bold">Прокат будівельного обладнання</h1>
-                    <p class="lead mt-3">Широкий асортимент професійного інструменту та техніки для будівництва та ремонту. Орендуйте те, що потрібно — на стільки, скільки потрібно.</p>
-                    <a th:href="@{/catalog}" class="btn btn-light btn-lg mt-3">
-                        <i class="bi bi-search"></i> Переглянути каталог
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <span class="badge bg-warning text-dark mb-3">Прокат у Києві з 2018 року</span>
+                    <h1 class="display-4">Будівельне обладнання — в оренду на день, тиждень, місяць</h1>
+                    <p class="lead mt-3">Перфоратори, бетонозмішувачі, лазерні нівеліри, генератори та сотні інших позицій. Зекономте на купівлі — орендуйте те, що потрібно тут і зараз.</p>
+                    <div class="d-flex gap-2 flex-wrap mt-4">
+                        <a th:href="@{/catalog}" class="btn btn-warning btn-lg fw-semibold">
+                            <i class="bi bi-search"></i> Каталог обладнання
+                        </a>
+                        <a th:href="@{/how-it-works}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-info-circle"></i> Як це працює
+                        </a>
+                    </div>
+                    <div class="br-stats">
+                        <div><strong>500+</strong>одиниць техніки</div>
+                        <div><strong>24/7</strong>підтримка клієнтів</div>
+                        <div><strong>4.8</strong>середній рейтинг</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center section-title">Категорії</h2>
+            <p class="text-center section-subtitle">Знайдіть саме те, що потрібно для вашого проєкту</p>
+            <div class="row g-3">
+                <div class="col-6 col-md-4 col-lg-2" th:each="cat : ${categories}">
+                    <a th:href="@{/category/{slug}(slug=${cat.slug})}" class="text-decoration-none">
+                        <div class="card cat-card text-center p-3">
+                            <div class="icon-circle">
+                                <i class="bi" th:classappend="${cat.iconClass != null ? cat.iconClass : 'bi-box-seam'}"></i>
+                            </div>
+                            <h6 class="mb-0 text-dark" th:text="${cat.name}">Категорія</h6>
+                        </div>
                     </a>
                 </div>
-                <div class="col-lg-4 text-center d-none d-lg-block">
-                    <i class="bi bi-tools" style="font-size: 8rem; opacity: 0.5;"></i>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+                <div>
+                    <h2 class="section-title mb-0">Популярне обладнання</h2>
+                    <p class="text-muted mb-0">Що найчастіше беруть в оренду цього сезону</p>
+                </div>
+                <a th:href="@{/catalog}" class="btn btn-link">Усі позиції <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" th:each="item : ${featured}">
+                    <div th:replace="~{fragments/equipment-card :: card(${item})}"></div>
+                </div>
+                <div class="col-12 empty-state" th:if="${#lists.isEmpty(featured)}">
+                    <i class="bi bi-box"></i>
+                    <p class="mb-0">Поки що немає доступного обладнання</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Categories -->
     <section class="py-5">
         <div class="container">
-            <h2 class="text-center mb-4">Категорії обладнання</h2>
+            <h2 class="text-center section-title">Як це працює</h2>
+            <p class="text-center section-subtitle">Чотири простих кроки до отримання техніки</p>
+            <div class="row g-4 mt-2">
+                <div class="col-md-3 text-center">
+                    <div class="icon-circle mx-auto" style="width:72px;height:72px;background:rgba(234,122,31,0.1);color:var(--br-primary);display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:2rem;">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h6 class="mt-3 fw-bold">1. Оберіть техніку</h6>
+                    <p class="text-muted small">Знайдіть потрібне обладнання у каталозі</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="icon-circle mx-auto" style="width:72px;height:72px;background:rgba(234,122,31,0.1);color:var(--br-primary);display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:2rem;">
+                        <i class="bi bi-calendar3"></i>
+                    </div>
+                    <h6 class="mt-3 fw-bold">2. Виберіть дати</h6>
+                    <p class="text-muted small">Вкажіть період та додайте в кошик</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="icon-circle mx-auto" style="width:72px;height:72px;background:rgba(234,122,31,0.1);color:var(--br-primary);display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:2rem;">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                    <h6 class="mt-3 fw-bold">3. Оформіть і оплатіть</h6>
+                    <p class="text-muted small">Підтвердіть замовлення онлайн</p>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="icon-circle mx-auto" style="width:72px;height:72px;background:rgba(234,122,31,0.1);color:var(--br-primary);display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:2rem;">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <h6 class="mt-3 fw-bold">4. Отримайте техніку</h6>
+                    <p class="text-muted small">Доставка або самовивіз — на ваш вибір</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-white" th:if="${not #lists.isEmpty(recentReviews)}">
+        <div class="container">
+            <h2 class="text-center section-title">Що кажуть клієнти</h2>
+            <p class="text-center section-subtitle">Реальні відгуки про нашу техніку та сервіс</p>
             <div class="row g-4">
-                <div class="col-md-3" th:each="category : ${categories}">
-                    <div class="card h-100 text-center border-0 shadow-sm">
+                <div class="col-md-4" th:each="rev : ${recentReviews}">
+                    <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body">
-                            <i class="bi bi-box-seam fs-1 text-primary"></i>
-                            <h5 class="card-title mt-3" th:text="${category.name}">Категорія</h5>
-                            <p class="card-text text-muted" th:text="${category.description}">Опис</p>
+                            <div th:replace="~{fragments/status-badge :: rating(${rev.rating})}"></div>
+                            <p class="mt-3 mb-2" th:text="${rev.text}">Відгук</p>
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span th:text="${rev.client.fullName()}">Клієнт</span>
+                                <span th:text="${#temporals.format(rev.createdAt, 'dd.MM.yyyy')}">01.01.2026</span>
+                            </div>
+                            <div class="mt-2 small text-primary">
+                                <i class="bi bi-tools"></i> <span th:text="${rev.equipment.name}">Обладнання</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -43,47 +134,28 @@
         </div>
     </section>
 
-    <!-- Featured Equipment -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-4">Доступне обладнання</h2>
-            <div class="row g-4">
-                <div class="col-md-4" th:each="item : ${featuredEquipment}" th:if="${#lists.size(featuredEquipment) > 0}">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <span class="badge bg-secondary mb-2" th:text="${item.category.name}">Категорія</span>
-                            <h5 class="card-title" th:text="${item.name}">Назва</h5>
-                            <p class="card-text text-muted" th:text="${item.description}">Опис</p>
-                        </div>
-                        <div class="card-footer bg-white d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-primary" th:text="${item.pricePerDay} + ' грн/добу'">Ціна</span>
-                            <a th:href="@{/catalog/{id}(id=${item.id})}" class="btn btn-outline-primary btn-sm">Детальніше</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Why Us -->
     <section class="py-5">
         <div class="container">
-            <h2 class="text-center mb-4">Чому обирають нас</h2>
             <div class="row g-4 text-center">
-                <div class="col-md-4">
-                    <i class="bi bi-shield-check fs-1 text-success"></i>
-                    <h5 class="mt-3">Якісне обладнання</h5>
-                    <p class="text-muted">Все обладнання перевірено та готове до роботи</p>
+                <div class="col-md-3">
+                    <i class="bi bi-shield-check fs-1 text-primary"></i>
+                    <h6 class="mt-2 fw-bold">Перевірена техніка</h6>
+                    <p class="text-muted small">Кожна одиниця проходить ТО перед видачею</p>
                 </div>
-                <div class="col-md-4">
-                    <i class="bi bi-cash-stack fs-1 text-warning"></i>
-                    <h5 class="mt-3">Вигідні ціни</h5>
-                    <p class="text-muted">Гнучка система ціноутворення та знижки</p>
+                <div class="col-md-3">
+                    <i class="bi bi-cash-coin fs-1 text-primary"></i>
+                    <h6 class="mt-2 fw-bold">Прозорі ціни</h6>
+                    <p class="text-muted small">Без прихованих платежів. Знижки на тривалу оренду</p>
                 </div>
-                <div class="col-md-4">
-                    <i class="bi bi-truck fs-1 text-info"></i>
-                    <h5 class="mt-3">Зручна доставка</h5>
-                    <p class="text-muted">Доставка обладнання на ваш об'єкт</p>
+                <div class="col-md-3">
+                    <i class="bi bi-truck fs-1 text-primary"></i>
+                    <h6 class="mt-2 fw-bold">Швидка доставка</h6>
+                    <p class="text-muted small">Доставимо обладнання у межах міста за 2 години</p>
+                </div>
+                <div class="col-md-3">
+                    <i class="bi bi-headset fs-1 text-primary"></i>
+                    <h6 class="mt-2 fw-bold">Підтримка 24/7</h6>
+                    <p class="text-muted small">Допоможемо обрати обладнання та провести інструктаж</p>
                 </div>
             </div>
         </div>

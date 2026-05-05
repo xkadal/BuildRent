@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Вхід</title>
+</head>
+<body>
+<main layout:fragment="content">
+<div class="container py-5">
+    <div class="card auth-card shadow-sm">
+        <div class="card-body">
+            <h3 class="text-center mb-4 fw-bold"><i class="bi bi-box-arrow-in-right text-primary"></i> Вхід в акаунт</h3>
+            <form th:action="@{/login}" method="post">
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required autofocus>
+                    <label for="email">Email</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Пароль" required>
+                    <label for="password">Пароль</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-lg">Увійти</button>
+            </form>
+            <hr class="my-4">
+            <p class="text-center text-muted mb-0">
+                Ще не маєте акаунту?
+                <a th:href="@{/register}" class="link-primary fw-semibold">Зареєструватись</a>
+            </p>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <small class="text-muted">Тестові акаунти: admin@buildrent.pp.ua / admin123 · client@buildrent.pp.ua / client123</small>
+    </div>
+</div>
+</main>
+</body>
+</html>

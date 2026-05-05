@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title>Реєстрація</title>
+</head>
+<body>
+<main layout:fragment="content">
+<div class="container py-5">
+    <div class="card auth-card shadow-sm">
+        <div class="card-body">
+            <h3 class="text-center mb-4 fw-bold"><i class="bi bi-person-plus text-primary"></i> Реєстрація</h3>
+            <form th:action="@{/register}" th:object="${form}" method="post" novalidate>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
+                                   placeholder="Ім'я" th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid' : ''">
+                            <label for="firstName">Ім'я</label>
+                            <div class="invalid-feedback" th:errors="*{firstName}"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="lastName" th:field="*{lastName}"
+                                   placeholder="Прізвище" th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid' : ''">
+                            <label for="lastName">Прізвище</label>
+                            <div class="invalid-feedback" th:errors="*{lastName}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" th:field="*{email}"
+                           placeholder="Email" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+                    <label for="email">Email</label>
+                    <div class="invalid-feedback" th:errors="*{email}"></div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="tel" class="form-control" id="phone" th:field="*{phone}"
+                           placeholder="+380…" th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''">
+                    <label for="phone">Телефон</label>
+                    <div class="invalid-feedback" th:errors="*{phone}"></div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" th:field="*{password}"
+                           placeholder="Пароль" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
+                    <label for="password">Пароль (мін. 8 символів)</label>
+                    <div class="invalid-feedback" th:errors="*{password}"></div>
+                </div>
+                <div class="form-floating mb-4">
+                    <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}"
+                           placeholder="Підтвердіть пароль"
+                           th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''">
+                    <label for="confirmPassword">Підтвердіть пароль</label>
+                    <div class="invalid-feedback" th:errors="*{confirmPassword}"></div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-lg">Створити акаунт</button>
+            </form>
+            <hr class="my-4">
+            <p class="text-center text-muted mb-0">
+                Вже маєте акаунт?
+                <a th:href="@{/login}" class="link-primary fw-semibold">Увійти</a>
+            </p>
+        </div>
+    </div>
+</div>
+</main>
+</body>
+</html>

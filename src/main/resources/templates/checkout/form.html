@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head><title>Оформлення замовлення</title></head>
+<body>
+<main layout:fragment="content">
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a th:href="@{/}">Головна</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/cart}">Кошик</a></li>
+            <li class="breadcrumb-item active">Оформлення</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4"><i class="bi bi-clipboard-check"></i> Оформлення замовлення</h1>
+
+    <form th:action="@{/checkout}" th:object="${form}" method="post" class="row g-4">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Контактна інформація</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">ПІБ</label>
+                            <input type="text" th:field="*{fullName}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Телефон</label>
+                            <input type="tel" th:field="*{phone}" class="form-control"
+                                   th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:errors="*{phone}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Спосіб отримання</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="dt-pickup"
+                               th:field="*{deliveryType}" value="PICKUP">
+                        <label class="form-check-label" for="dt-pickup">
+                            <strong>Самовивіз</strong> — безкоштовно, м. Київ, вул. Будівельна 12
+                        </label>
+                    </div>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="radio" id="dt-delivery"
+                               th:field="*{deliveryType}" value="DELIVERY">
+                        <label class="form-check-label" for="dt-delivery">
+                            <strong>Доставка</strong> —
+                            <span th:text="${#numbers.formatDecimal(deliveryFee,0,'NONE',0,'NONE')} + ' ₴'">200 ₴</span>
+                            по місту
+                        </label>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">Адреса доставки</label>
+                        <input type="text" th:field="*{deliveryAddress}" class="form-control"
+                               placeholder="Місто, вулиця, будинок, квартира"
+                               th:classappend="${#fields.hasErrors('deliveryAddress')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:errors="*{deliveryAddress}"></div>
+                        <small class="text-muted">Обов'язково за умови доставки</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Коментар до замовлення</h5>
+                    <textarea th:field="*{clientNotes}" rows="3" class="form-control"
+                              placeholder="Побажання, особливі вимоги, час доставки..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <aside class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 90px;">
+                <div class="card-body">
+                    <h5 class="card-title">Ваше замовлення</h5>
+                    <ul class="list-unstyled small mb-3">
+                        <li class="d-flex justify-content-between py-1" th:each="i : ${items}">
+                            <span>
+                                <span th:text="${i.name}">Назва</span>
+                                · <span th:text="${i.quantity}">1</span>×
+                                <span th:text="${i.days}">1</span>дн.
+                            </span>
+                            <strong th:text="${#numbers.formatDecimal(i.lineTotal(),0,'NONE',0,'NONE')} + ' ₴'">0</strong>
+                        </li>
+                    </ul>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Підсумок</span>
+                        <strong th:text="${#numbers.formatDecimal(subtotal,0,'NONE',0,'NONE')} + ' ₴'">0</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Доставка</span>
+                        <strong>
+                            <span th:if="${form.deliveryType?.name() == 'DELIVERY'}"
+                                  th:text="${#numbers.formatDecimal(deliveryFee,0,'NONE',0,'NONE')} + ' ₴'">0</span>
+                            <span th:unless="${form.deliveryType?.name() == 'DELIVERY'}" class="text-success">безкоштовно</span>
+                        </strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between fs-5">
+                        <span>До сплати</span>
+                        <strong class="text-primary">
+                            <span th:if="${form.deliveryType?.name() == 'DELIVERY'}"
+                                  th:text="${#numbers.formatDecimal(subtotal.add(deliveryFee),0,'NONE',0,'NONE')} + ' ₴'"></span>
+                            <span th:unless="${form.deliveryType?.name() == 'DELIVERY'}"
+                                  th:text="${#numbers.formatDecimal(subtotal,0,'NONE',0,'NONE')} + ' ₴'"></span>
+                        </strong>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
+                        <i class="bi bi-arrow-right"></i> Підтвердити та перейти до оплати
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </form>
+</div>
+</main>
+</body>
+</html>

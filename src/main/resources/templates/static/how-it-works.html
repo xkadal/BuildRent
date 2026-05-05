@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head><title>Як працює</title></head>
+<body>
+<main layout:fragment="content">
+<div class="container py-4">
+    <h1 class="mb-4"><i class="bi bi-question-circle"></i> Як працює BuildRent</h1>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-primary fw-bold">1</div>
+                    <h5><i class="bi bi-search"></i> Оберіть</h5>
+                    <p class="text-muted small mb-0">
+                        Перегляньте каталог, оберіть обладнання та дати оренди.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-primary fw-bold">2</div>
+                    <h5><i class="bi bi-cart-check"></i> Оформіть</h5>
+                    <p class="text-muted small mb-0">
+                        Додайте позиції в кошик, заповніть дані доставки та підтвердіть.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-primary fw-bold">3</div>
+                    <h5><i class="bi bi-credit-card"></i> Оплатіть</h5>
+                    <p class="text-muted small mb-0">
+                        Здійсніть оплату онлайн або під час отримання.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-primary fw-bold">4</div>
+                    <h5><i class="bi bi-tools"></i> Користуйтесь</h5>
+                    <p class="text-muted small mb-0">
+                        Отримайте обладнання, інструктаж і починайте роботу.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 bg-light mt-4">
+        <div class="card-body">
+            <h4>Що ви отримуєте</h4>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <p><i class="bi bi-shield-check text-primary fs-4"></i></p>
+                    <strong>Перевірене обладнання</strong>
+                    <p class="text-muted small">Кожна одиниця проходить ТО перед видачею</p>
+                </div>
+                <div class="col-md-4">
+                    <p><i class="bi bi-headset text-primary fs-4"></i></p>
+                    <strong>Інструктаж</strong>
+                    <p class="text-muted small">Покажемо, як безпечно працювати з технікою</p>
+                </div>
+                <div class="col-md-4">
+                    <p><i class="bi bi-life-preserver text-primary fs-4"></i></p>
+                    <strong>Підтримка 7/24</strong>
+                    <p class="text-muted small">Якщо щось пішло не так — зателефонуйте нам</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a th:href="@{/catalog}" class="btn btn-primary btn-lg">
+            <i class="bi bi-arrow-right"></i> Перейти до каталогу
+        </a>
+    </div>
+</div>
+</main>
+</body>
+</html>

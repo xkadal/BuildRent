@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head><title>Оплата</title></head>
+<body>
+<main layout:fragment="content">
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-credit-card-2-front display-3 text-primary"></i>
+                        <h2 class="mt-2 mb-1">Оплата замовлення</h2>
+                        <p class="text-muted mb-0">№ <strong th:text="${rental.orderNumber}">BR-...</strong></p>
+                    </div>
+
+                    <div class="alert alert-info small mb-4">
+                        <i class="bi bi-info-circle"></i>
+                        Це навчальна імітація платежу. Натискання кнопки переведе замовлення у статус «Оплачено».
+                    </div>
+
+                    <table class="table table-borderless">
+                        <tr><td class="text-muted">Період</td>
+                            <td class="text-end">
+                                <span th:text="${#temporals.format(rental.startDate,'dd.MM.yyyy')}"></span> –
+                                <span th:text="${#temporals.format(rental.endDate,'dd.MM.yyyy')}"></span>
+                            </td></tr>
+                        <tr><td class="text-muted">Спосіб отримання</td>
+                            <td class="text-end" th:text="${rental.deliveryType.name() == 'DELIVERY' ? 'Доставка' : 'Самовивіз'}"></td></tr>
+                        <tr><td class="text-muted">Підсумок</td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(rental.subtotal,0,'NONE',0,'NONE')} + ' ₴'"></td></tr>
+                        <tr><td class="text-muted">Доставка</td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(rental.deliveryFee,0,'NONE',0,'NONE')} + ' ₴'"></td></tr>
+                        <tr class="border-top"><td class="fs-5">До сплати</td>
+                            <td class="text-end fs-5 text-primary fw-bold"
+                                th:text="${#numbers.formatDecimal(rental.total,0,'NONE',0,'NONE')} + ' ₴'"></td></tr>
+                    </table>
+
+                    <form th:action="@{'/checkout/payment/' + ${rental.orderNumber}}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-shield-check"></i> Оплатити
+                            <span th:text="${#numbers.formatDecimal(rental.total,0,'NONE',0,'NONE')} + ' ₴'"></span>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a th:href="@{/account/orders}" class="text-muted small">
+                            <i class="bi bi-arrow-left"></i> Оплатити пізніше з кабінету
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+</body>
+</html>
